@@ -1,0 +1,12 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.DS_Store
+
+# Generated template media — keep JSON metadata, ignore the heavy mp4s
+templates/*.mp4
+templates/*.mov
+templates/*.webm
+
+# Raycast build output
+packages/raycast/.raycast/

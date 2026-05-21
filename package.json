@@ -1,0 +1,22 @@
+{
+  "name": "cortisol-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Daily Cortisol Status video generator — CLI + Raycast extension",
+  "workspaces": [
+    "packages/core",
+    "packages/cli"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "cli": "npm run --workspace @cortisol/cli start --",
+    "clean": "rm -rf packages/*/dist packages/*/tsconfig.tsbuildinfo"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "typescript": "^6.0.3"
+  }
+}

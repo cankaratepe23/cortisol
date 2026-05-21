@@ -1,0 +1,64 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "cortisol",
+  "title": "Daily Cortisol Status",
+  "description": "Generate daily Cortisol Status videos from named templates",
+  "icon": "icon.png",
+  "author": "cankaratepe",
+  "license": "MIT",
+  "categories": ["Productivity", "Media"],
+  "commands": [
+    {
+      "name": "generate",
+      "title": "Generate Today's Clip",
+      "subtitle": "Cortisol",
+      "description": "Pick a template and stamp today's date onto it",
+      "mode": "view"
+    },
+    {
+      "name": "import",
+      "title": "Import Template",
+      "subtitle": "Cortisol",
+      "description": "Import a video (URL or local file) as a named template",
+      "mode": "view"
+    },
+    {
+      "name": "preview",
+      "title": "Preview Template",
+      "subtitle": "Cortisol",
+      "description": "Preview today's date on a template as a single PNG frame",
+      "mode": "view"
+    }
+  ],
+  "preferences": [
+    {
+      "name": "cliPath",
+      "title": "Cortisol CLI Path",
+      "description": "Absolute path to the cortisol CLI entry point (e.g. /Users/you/.../cortisol/packages/cli/dist/index.js)",
+      "type": "textfield",
+      "required": true,
+      "default": ""
+    },
+    {
+      "name": "outDir",
+      "title": "Default Output Directory",
+      "description": "Where to write rendered MP4/GIF files. Defaults to ~/Pictures/Daily Cortisol Status",
+      "type": "textfield",
+      "required": false,
+      "default": ""
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^1.83.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^18.3.0",
+    "typescript": "^5.5.0"
+  },
+  "scripts": {
+    "dev": "ray develop",
+    "build": "ray build",
+    "lint": "ray lint"
+  }
+}
