@@ -115,7 +115,7 @@ export async function importTemplate(opts: ImportOptions): Promise<ImportResult>
 
     // Probe to capture real dimensions of the produced file.
     const meta = await probe(videoOut);
-    const bandHeight = opts.bandHeight ?? defaultBandHeight(meta.height);
+    const bandHeight = opts.bandHeight ?? defaultBandHeight(meta.width, meta.height);
     const fontSize = opts.fontSize ?? defaultFontSize(bandHeight);
     const fontFile = opts.fontFile ?? defaultFontFile();
     const fontColor = opts.fontColor ?? "black";

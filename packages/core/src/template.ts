@@ -119,17 +119,27 @@ export async function findTemplate(dir: string, query: string): Promise<Template
 }
 
 /**
- * Compute a sensible default band height for a given source height.
- * ~18% of source height, rounded to nearest even number (yuv420p needs even).
+ * Compute a sensible default band height for a source clip's dimensions.
+ *
+ * - For portrait / square sources: 270px (a solid two-line band).
+ * - For landscape sources: enough band to bring the output close to a 1:1
+ *   square. e.g. a 1000×700 source gets a 300px band → 1000×1000 output.
+ *
+ * Rounded to an even number so yuv420p stays happy.
  */
-export function defaultBandHeight(sourceHeight: number): number {
-  const raw = Math.round(sourceHeight * 0.18);
+export function defaultBandHeight(sourceWidth: number, sourceHeight: number): number {
+  const squareGap = Math.max(0, sourceWidth - sourceHeight);
+  const raw = Math.max(270, squareGap);
   return raw % 2 === 0 ? raw : raw + 1;
 }
 
-/** Default fontsize given band height. Tuned against the screenshot examples. */
+/**
+ * Default fontsize given band height. Tuned so a 270px band yields ~100pt,
+ * which lets two stacked lines (with our negative `-interline-spacing`)
+ * fill the band cleanly.
+ */
 export function defaultFontSize(bandHeight: number): number {
-  return Math.max(24, Math.round(bandHeight * 0.24));
+  return Math.max(24, Math.round(bandHeight * 0.37));
 }
 
 /** Default macOS font. Other platforms can override via --font-file at import. */

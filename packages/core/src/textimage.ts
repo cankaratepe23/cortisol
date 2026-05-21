@@ -2,14 +2,15 @@
 //
 // We use ImageMagick instead of ffmpeg's drawtext because the Homebrew
 // ffmpeg formula doesn't include libfreetype, so `drawtext` is unavailable.
-// ImageMagick is a small dep (already present on this user's machine) and
-// gives us much cleaner typography control anyway.
 //
-// The band is produced by stacking two `caption:` pseudo-images:
-//   - top: the date line, taller (~55% of band)
-//   - bottom: the day line, shorter (~45% of band)
-// Both have a white background and centered text, so `-append` produces a
-// seamless single image of the requested `width × bandHeight` dimensions.
+// The band is a single `label:` pseudo-image containing both lines joined by
+// a newline. Rendering both lines through one `label:` call (rather than two
+// stacked `caption:` rows) guarantees:
+//   - both lines use the same point size (caller-controlled `template.fontSize`)
+//   - line spacing is tight and explicit (via `-interline-spacing`), not the
+//     accumulated whitespace from two separately-padded rows
+// The label is then padded to exactly `width × bandHeight` with `-extent`
+// so the band aligns pixel-perfectly with the source video when overlaid.
 
 import { promises as fs } from "node:fs";
 import os from "node:os";
@@ -37,28 +38,29 @@ export async function renderBand(
   const pngPath = path.join(tmpDir, "band.png");
 
   const { width, bandHeight, fontSize, fontFile, fontColor } = template;
-  // Split the band into two stacked rows. The date row is a bit larger so its
-  // text appears more prominent (matches the screenshots).
-  const dateRow = Math.round(bandHeight * 0.55);
-  const dayRow = bandHeight - dateRow;
-  const daySize = Math.round(fontSize * 0.75);
+  // Tighten the gap between lines. ImageMagick's default line spacing is the
+  // full font cap-height — a hair too generous for our two-line band. A
+  // negative ~10% pull-in matches the proportions of the original screenshots.
+  const interlineSpacing = -Math.round(fontSize * 0.1);
+
+  // Note: `label:` accepts an embedded newline in the text argument and
+  // renders the lines stacked using the current font/pointsize for both,
+  // so both lines come out the same size automatically.
+  const labelText = `${formatted.dateLine}\n${formatted.dayLine}`;
 
   await run("magick", [
     "-background", "white",
     "-fill", fontColor,
     "-font", fontFile,
-    // Date line
-    "-size", `${width}x${dateRow}`,
-    "-gravity", "center",
     "-pointsize", String(fontSize),
-    `caption:${formatted.dateLine}`,
-    // Day line
-    "-size", `${width}x${dayRow}`,
     "-gravity", "center",
-    "-pointsize", String(daySize),
-    `caption:${formatted.dayLine}`,
-    // Stack them vertically and write
-    "-append",
+    "-interline-spacing", String(interlineSpacing),
+    `label:${labelText}`,
+    // Pad / center into the exact band dimensions so overlay at (0,0) aligns
+    // with the padded source video.
+    "-background", "white",
+    "-gravity", "center",
+    "-extent", `${width}x${bandHeight}`,
     pngPath,
   ]);
 
